@@ -134,6 +134,11 @@ public class PrettyPrintVisitor implements Visitor {
     System.out.print("int");
   }
 
+  @Override
+  public void visit(DoubleType n) {
+    System.out.print("double");
+  }
+
   // String s;
   public void visit(IdentifierType n) {
     System.out.print(n.s);

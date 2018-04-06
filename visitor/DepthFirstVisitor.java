@@ -93,6 +93,11 @@ public class DepthFirstVisitor implements Visitor {
   public void visit(IntegerType n) {
   }
 
+  @Override
+  public void visit(DoubleType n) {
+
+  }
+
   // String s;
   public void visit(IdentifierType n) {
   }

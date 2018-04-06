@@ -103,6 +103,11 @@ public class TypeDepthFirstVisitor implements TypeVisitor {
     return null;
   }
 
+  @Override
+  public Type visit(DoubleType n) {
+    return null;
+  }
+
   // String s;
   public Type visit(IdentifierType n) {
     return null;

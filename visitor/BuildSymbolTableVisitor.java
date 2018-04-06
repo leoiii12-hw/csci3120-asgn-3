@@ -207,6 +207,10 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
     return n;
   }
 
+  public Type visit(DoubleType n) {
+    return n;
+  }
+
   // String s;
   public Type visit(IdentifierType n) {
     return n;

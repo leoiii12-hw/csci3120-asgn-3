@@ -42,6 +42,7 @@ TOKEN :
 | < AND : "&" >   
 | < NOT : "!" >   
 | < BOOLEAN: "boolean" >   
+| < DOUBLE: "double" >
 | < CLASS: "class" >
 | < INTERFACE: "interface" >
 | < ELSE: "else" >
@@ -246,6 +247,8 @@ Type Type() :
 |
   t=IntegerType()
 |
+  t=DoubleType()
+|
   t=IdentifierType()     
   )
   { return t; }
@@ -270,6 +273,13 @@ Type IntegerType() :
 {
   "int"
   { return new IntegerType(); }
+}
+
+Type DoubleType() :
+{}
+{
+  "double"
+  { return new DoubleType(); }
 }
 
 Type IdentifierType() :
