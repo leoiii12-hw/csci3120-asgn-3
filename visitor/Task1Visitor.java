@@ -190,6 +190,12 @@ public class Task1Visitor extends DepthFirstVisitor {
   public void visit(Assign n) {
     Type t1 = symbolTable.getVarType(currMethod, currClass, n.i.toString());
     Type t2 = n.e.accept(new Task1TypeCheckExpVisitor());
+
+    if (t1 == null) {
+      System.err.printf("%s: Unknown identifier (%s,%s)%n", n.i.toString(), n.token.beginLine, n.token.beginColumn);
+      return;
+    }
+
     if (symbolTable.compareTypes(t1, t2) == false) {
       System.out.println("Type error in assignment to " + n.i.toString());
       System.exit(0);
@@ -201,20 +207,22 @@ public class Task1Visitor extends DepthFirstVisitor {
   public void visit(ArrayAssign n) {
     Type typeI = symbolTable.getVarType(currMethod, currClass, n.i.toString());
 
+    if (typeI == null) {
+      System.err.printf("%s: Unknown identifier (%s,%s)%n", n.i.toString(), n.token.beginLine, n.token.beginColumn);
+      return;
+    }
+
     if (!(typeI instanceof IntArrayType)) {
-      System.out.println("The identifier in an array assignment" +
-          "must be of type int []");
+      System.out.println("The identifier in an array assignment" + "must be of type int []");
       System.exit(-1);
     }
 
     if (!(n.e1.accept(new Task1TypeCheckExpVisitor()) instanceof IntegerType)) {
-      System.out.println("The first expression in an array assignment" +
-          "must be of type int");
+      System.out.println("The first expression in an array assignment" + "must be of type int");
       System.exit(-1);
     }
     if (!(n.e1.accept(new Task1TypeCheckExpVisitor()) instanceof IntegerType)) {
-      System.out.println("The second expression in an array assignment" +
-          "must be of type int");
+      System.out.println("The second expression in an array assignment" + "must be of type int");
       System.exit(-1);
     }
   }

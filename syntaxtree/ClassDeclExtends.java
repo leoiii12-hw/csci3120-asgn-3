@@ -1,4 +1,5 @@
 package syntaxtree;
+import myparser.Token;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
@@ -13,10 +14,11 @@ public class ClassDeclExtends extends ClassDecl {
   public Identifier j;
   public VarDeclList vl;      // Sequence of variable declarations
   public MethodDeclList ml;   // Sequence of method declarations
+  public Token token;
  
   public ClassDeclExtends(Identifier ai, Identifier aj, 
-                  VarDeclList avl, MethodDeclList aml) {
-    i=ai; j=aj; vl=avl; ml=aml;
+                  VarDeclList avl, MethodDeclList aml, Token token) {
+    i=ai; j=aj; vl=avl; ml=aml; this.token = token;
   }
 
   public void accept(Visitor v) {

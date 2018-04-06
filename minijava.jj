@@ -161,10 +161,10 @@ ClassDecl ClassDeclarationSimple() :
   MethodDeclList ml = new MethodDeclList();
 }
 {
-  "class" i=Identifier() "{" ( v=VarDeclaration()    { vl.addElement(v); } )* 
+  "class" { Token tk = token; } i=Identifier() "{" ( v=VarDeclaration()    { vl.addElement(v); } )*
                              ( m=MethodDeclaration() { ml.addElement(m); } )* 
                        "}"
-  { return new ClassDeclSimple(i,vl,ml); }
+  { return new ClassDeclSimple(i,vl,ml,tk); }
 }
 
 ClassDecl ClassDeclarationExtends() :
@@ -175,11 +175,11 @@ ClassDecl ClassDeclarationExtends() :
   MethodDeclList ml = new MethodDeclList();
 }
 {
-  "class" i1=Identifier() "extends" i2=Identifier()
+  "class" { Token tk = token; } i1=Identifier() "extends" i2=Identifier()
                        "{"   ( v=VarDeclaration()    { vl.addElement(v); } )* 
                              ( m=MethodDeclaration() { ml.addElement(m); } )* 
                        "}"
-  { return new ClassDeclExtends(i1,i2,vl,ml); }
+  { return new ClassDeclExtends(i1,i2,vl,ml,tk); }
 }
 
 VarDecl VarDeclaration() :  
@@ -187,8 +187,8 @@ VarDecl VarDeclaration() :
   Identifier i;
 }
 { 
-  t=Type() i=Identifier() ";"      
-  { return new VarDecl(t,i); }
+  t=Type() { Token tk = token; } i=Identifier() ";"
+  { return new VarDecl(t,i,tk); }
 }
 
 MethodDecl MethodDeclaration() :  
@@ -203,11 +203,11 @@ MethodDecl MethodDeclaration() :
   Exp e; 
 }
 {
-  "public" t=Type() i=Identifier() 
+  "public" { Token tk = token; } t=Type() i=Identifier()
   "(" ( fl=FormalParameterList() )? ")"   
   "{" ( LOOKAHEAD(2) v=VarDeclaration() { vl.addElement(v); } )* 
       ( s=Statement() { sl.addElement(s); } )* "return" e=Expression() ";" "}"
-  { return new MethodDecl(t,i,fl,vl,sl,e); }
+  { return new MethodDecl(t,i,fl,vl,sl,e,tk); }
 }
 
 FormalList FormalParameterList() :
@@ -225,8 +225,8 @@ Formal FormalParameter() :
   Identifier i;
 }
 {
-  t=Type() i=Identifier()
-  { return new Formal(t,i); }
+  t=Type() { Token tk = token; } i=Identifier()
+  { return new Formal(t,i, tk); }
 }
 
 Formal FormalParameterRest() :
@@ -325,8 +325,8 @@ Statement AssignmentStatement() :
   Exp e; 
 }
 {
-  i=Identifier() "=" e=Expression() ";"
-  { return new Assign(i,e); }
+  i=Identifier() { Token t = token; } "=" e=Expression() ";"
+  { return new Assign(i,e,t); }
 }
 
 Statement ArrayAssignmentStatement() :
@@ -334,8 +334,8 @@ Statement ArrayAssignmentStatement() :
   Exp e1,e2;
 }
 {
-  i=Identifier() "[" e1=Expression() "]" "=" e2=Expression() ";"
-  { return new ArrayAssign(i,e1,e2); }
+  i=Identifier() { Token t = token; } "[" e1=Expression() "]" "=" e2=Expression() ";"
+  { return new ArrayAssign(i,e1,e2,t); }
 }
 
 Statement IfStatement() :

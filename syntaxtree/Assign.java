@@ -1,13 +1,15 @@
 package syntaxtree;
+import myparser.Token;
 import visitor.Visitor;
 import visitor.TypeVisitor;
 
 public class Assign extends Statement {
   public Identifier i;
   public Exp e;
+  public Token token;
 
-  public Assign(Identifier ai, Exp ae) {
-    i=ai; e=ae; 
+  public Assign(Identifier ai, Exp ae, Token token) {
+    i=ai; e=ae; this.token=token;
   }
 
   public void accept(Visitor v) {

@@ -16,11 +16,11 @@ class SymbolTable {
 
   // Register the class name and map it to a new class (with its supperclass)
   // Return false if there is a name conflicts. Otherwise return true.
-  public boolean addClass(String id, String parent) {
+  public boolean addClass(String id, String parent, int beginLine, int beginColumn) {
     if (containsClass(id))
       return false;
     else
-      hashtable.put(id, new Class(id, parent));
+      hashtable.put(id, new Class(id, parent, beginLine, beginColumn));
     return true;
   }
 
@@ -153,18 +153,19 @@ class Class {
   protected Hashtable<String, Variable> fields;
   protected String parent;  // Superclass's name  (null if there is no superclass)
   protected Type type;      // An instance of Type that represents this class
+  private final int beginLine;
+  private final int beginColumn;
 
   // Model a class named "id" that extend a class name "p"
   // "p" is null if class "id" does has extend any class
-  public Class(String id, String p) {
+  public Class(String id, String p, int beginLine, int beginColumn) {
     this.id = id;
     parent = p;
     type = new IdentifierType(id);
     methods = new Hashtable<String, Method>();
     fields = new Hashtable<String, Variable>();
-  }
-
-  public Class() {
+    this.beginLine = beginLine;
+    this.beginColumn = beginColumn;
   }
 
   public String getId() {
@@ -181,11 +182,11 @@ class Class {
   // will be added later
   // 
   // Return false if there is a name conflict (among all method names only)
-  public boolean addMethod(String id, Type type) {
+  public boolean addMethod(String id, Type type, int beginLine, int beginColumn) {
     if (containsMethod(id))
       return false;
     else {
-      Method method = new Method(id, type, this);
+      Method method = new Method(id, type, this, beginLine, beginColumn);
       methods.put(id, method);
 
       return true;
@@ -207,11 +208,11 @@ class Class {
 
   // Add a field
   // Return false if there is a name conflict (among all fields only)
-  public boolean addVar(String id, Type type) {
+  public boolean addVar(String id, Type type, int beginLine, int beginColumn) {
     if (fields.containsKey(id))
       return false;
     else {
-      Variable var = new Variable(id, type, this, null);
+      Variable var = new Variable(id, type, this, null, beginLine, beginColumn);
       fields.put(id, var);
 
       return true;
@@ -237,6 +238,14 @@ class Class {
   public String getParentId() {
     return parent;
   }
+
+  public int getBeginLine() {
+    return beginLine;
+  }
+
+  public int getBeginColumn() {
+    return beginColumn;
+  }
 } // Class
 
 // Store all properties that describe a variable
@@ -246,12 +255,16 @@ class Variable {
   protected Type type;
   private final Class c;
   private final Method m;
+  private final int beginLine;
+  private final int beginColumn;
 
-  public Variable(String id, Type type, Class c, Method m) {
+  public Variable(String id, Type type, Class c, Method m, int beginLine, int beginColumn) {
     this.id = id;
     this.type = type;
     this.c = c;
     this.m = m;
+    this.beginLine = beginLine;
+    this.beginColumn = beginColumn;
   }
 
   public String getId() {
@@ -264,6 +277,14 @@ class Variable {
     } else {
       return c.getId() + "::" + m.getId() + "::" + id;
     }
+  }
+
+  public int getBeginLine() {
+    return beginLine;
+  }
+
+  public int getBeginColumn() {
+    return beginColumn;
   }
 
   public Type getType() {
@@ -280,12 +301,16 @@ class Method {
   protected Vector<Variable> params;          // Formal parameters
   protected Hashtable<String, Variable> vars; // Local variables
 
-  private final Class c;
+  private final Class scopingClass;
+  private final int beginLine;
+  private final int beginColumn;
 
-  public Method(String id, Type type, Class c) {
+  public Method(String id, Type type, Class scopingClass, int beginLine, int beginColumn) {
     this.id = id;
     this.type = type;
-    this.c = c;
+    this.scopingClass = scopingClass;
+    this.beginLine = beginLine;
+    this.beginColumn = beginColumn;
     params = new Vector<Variable>();
     vars = new Hashtable<String, Variable>();
   }
@@ -296,14 +321,14 @@ class Method {
 
   public String getUniqueId() {
     StringBuilder builder = new StringBuilder();
-    builder.append(c.getId()).append("::").append(id).append("(");
+    builder.append(scopingClass.getId()).append("::").append(id).append("(");
     builder.append(getParamsAsString());
     builder.append(")");
 
     return builder.toString();
   }
 
-  public String getParamsAsString(){
+  public String getParamsAsString() {
     StringBuilder builder = new StringBuilder();
 
     for (int i = 0, paramsSize = params.size(); i < paramsSize; i++) {
@@ -313,7 +338,7 @@ class Method {
       builder.append(" ");
       builder.append(var.getId());
 
-      if (i != paramsSize - 1){
+      if (i != paramsSize - 1) {
         builder.append(", ");
       }
     }
@@ -327,11 +352,11 @@ class Method {
 
   // Add a formal parameter
   // Return false if there is a name conflict
-  public boolean addParam(String id, Type type) {
+  public boolean addParam(String id, Type type, int beginLine, int beginColumn) {
     if (containsParam(id))
       return false;
     else {
-      Variable var = new Variable(id, type, c, this);
+      Variable var = new Variable(id, type, scopingClass, this, beginLine, beginColumn);
       params.addElement(var);
 
       return true;
@@ -352,11 +377,11 @@ class Method {
 
   // Add a local variable
   // Return false if there is a name conflict
-  public boolean addVar(String id, Type type) {
+  public boolean addVar(String id, Type type, int beginLine, int beginColumn) {
     if (vars.containsKey(id))
       return false;
     else {
-      Variable var = new Variable(id, type, c, this);
+      Variable var = new Variable(id, type, scopingClass, this, beginLine, beginColumn);
       vars.put(id, var);
 
       return true;
@@ -390,6 +415,13 @@ class Method {
     return null;
   }
 
+  public int getBeginLine() {
+    return beginLine;
+  }
+
+  public int getBeginColumn() {
+    return beginColumn;
+  }
 } // Method
 
 
