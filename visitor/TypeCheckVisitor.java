@@ -77,7 +77,7 @@ public class TypeCheckVisitor extends DepthFirstVisitor {
     n.t.accept(this);
     String id = n.i.toString();
     currMethod = currClass.getMethod(id);
-    Type retType = currMethod.type();
+    Type retType = currMethod.getType();
     for ( int i = 0; i < n.fl.size(); i++ ) {
         n.fl.elementAt(i).accept(this);
     }

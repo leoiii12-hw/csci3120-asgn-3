@@ -113,7 +113,7 @@ public class TypeCheckExpVisitor extends TypeDepthFirstVisitor {
 	Type t2 =null;  
 
 	if (calledMethod.getParamAt(i)!=null)
-	    t1 = calledMethod.getParamAt(i).type();
+	    t1 = calledMethod.getParamAt(i).getType();
 	t2 = n.el.elementAt(i).accept(this);
 	if (!TypeCheckVisitor.symbolTable.compareTypes(t1,t2)){
 	    System.out.println("Type Error in arguments passed to " +
@@ -145,7 +145,7 @@ public class TypeCheckExpVisitor extends TypeDepthFirstVisitor {
   }
 
   public Type visit(This n) {
-      return TypeCheckVisitor.currClass.type();
+      return TypeCheckVisitor.currClass.getType();
   }
 
   // Exp e;
