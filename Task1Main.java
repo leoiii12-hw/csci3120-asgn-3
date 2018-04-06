@@ -1,7 +1,8 @@
 import myparser.MiniJavaParser;
 import myparser.ParseException;
 import syntaxtree.Program;
-import visitor.NameScopeVisitor;
+import visitor.BuildSymbolTableVisitor;
+import visitor.Task1Visitor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,9 +29,12 @@ public class Task1Main {
     try {
       Program root = new MiniJavaParser(inputStream).Goal();
 
+      // Build the symbol table
+      BuildSymbolTableVisitor buildSymTab = new BuildSymbolTableVisitor();
+      root.accept(buildSymTab);
 
-      NameScopeVisitor nameScopeVisitor = new NameScopeVisitor(identifier);
-      root.accept(nameScopeVisitor);
+      Task1Visitor task1Visitor = new Task1Visitor(buildSymTab.getSymTab(), identifier);
+      root.accept(task1Visitor);
 
     } catch (ParseException e) {
       System.out.println(e.toString());

@@ -122,16 +122,14 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
     if (currMethod == null) {
 
       // Add a field
-      Variable var = currClass.addVar(id, t);
-      if (var==null) {
+      if (!currClass.addVar(id,t)) {
 	 System.out.println(id + "is already defined in " 
 			    + currClass.getId()); 
 	 System.exit(-1);
       }
     } else {
       // Add a local variable
-      Variable var = currMethod.addVar(id,t);
-      if (var == null){
+      if (!currMethod.addVar(id,t)){
         System.out.println(id + "is already defined in " 
 		           + currClass.getId() + "." + currMethod.getId());
 	System.exit(-1);
@@ -152,8 +150,7 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
     Type t = n.t.accept(this);
     String id = n.i.toString();
 
-    Method method = currClass.addMethod(id, t);
-    if (method == null){
+    if (!currClass.addMethod(id,t)){
 	System.out.println("Method " + id 
 			   + "is already defined in " 
 			   + currClass.getId()); 
@@ -189,8 +186,7 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
     Type t = n.t.accept(this);
     String id = n.i.toString();
 
-    Variable var = currMethod.addParam(id,t);
-    if (var == null){
+    if (!currMethod.addParam(id,t)){
 	System.out.println("Formal" + id + "is already defined in " 
 			   + currClass.getId() + "." +
 			   currMethod.getId());

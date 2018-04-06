@@ -14,6 +14,7 @@ class BT {
 	boolean ntb ;
 	int nti ;
 
+	yo = new Tree();
 	root = new Tree();
 	ntb = root.Init(16);
 	ntb = root.Print();

@@ -62,16 +62,13 @@ class SymbolTable {
       if (c.getVar(id) != null) {
         return c.getVar(id).getType();  // Found!
       } else // Try its superclass (and their superclasses)
-        if (c.parent() == null) {
+        if (c.getParentId() == null) {
           c = null;
         } else {
-          c = getClass(c.parent());
+          c = getClass(c.getParentId());
         }
     }
 
-    System.out.println("Variable " + id
-        + " not defined in current scope");
-    System.exit(0);  // Panic!
     return null;
   }
 
@@ -89,10 +86,10 @@ class SymbolTable {
     while (c != null) {
       if (c.getMethod(id) != null) {
         return c.getMethod(id);   // Found!
-      } else if (c.parent() == null) {
+      } else if (c.getParentId() == null) {
         c = null;
       } else {
-        c = getClass(c.parent());
+        c = getClass(c.getParentId());
       }
     }
 
@@ -136,10 +133,10 @@ class SymbolTable {
           return true;
         else { // Check the next class along the class heirachy
 
-          if (c.parent() == null)
+          if (c.getParentId() == null)
             return false;
 
-          c = getClass(c.parent());
+          c = getClass(c.getParentId());
         }
       }
     }
@@ -184,14 +181,14 @@ class Class {
   // will be added later
   // 
   // Return false if there is a name conflict (among all method names only)
-  public Method addMethod(String id, Type type) {
+  public boolean addMethod(String id, Type type) {
     if (containsMethod(id))
-      return null;
+      return false;
     else {
       Method method = new Method(id, type, this);
       methods.put(id, method);
 
-      return method;
+      return true;
     }
   }
 
@@ -210,14 +207,14 @@ class Class {
 
   // Add a field
   // Return false if there is a name conflict (among all fields only)
-  public Variable addVar(String id, Type type) {
+  public boolean addVar(String id, Type type) {
     if (fields.containsKey(id))
-      return null;
+      return false;
     else {
       Variable var = new Variable(id, type, this, null);
       fields.put(id, var);
 
-      return var;
+      return true;
     }
   }
 
@@ -237,7 +234,7 @@ class Class {
     return methods.containsKey(id);
   }
 
-  public String parent() {
+  public String getParentId() {
     return parent;
   }
 } // Class
@@ -300,13 +297,13 @@ class Method {
   public String getUniqueId() {
     StringBuilder builder = new StringBuilder();
     builder.append(c.getId()).append("::").append(id).append("(");
-    builder.append(getParamsString());
+    builder.append(getParamsAsString());
     builder.append(")");
 
     return builder.toString();
   }
 
-  public String getParamsString(){
+  public String getParamsAsString(){
     StringBuilder builder = new StringBuilder();
 
     for (int i = 0, paramsSize = params.size(); i < paramsSize; i++) {
@@ -330,14 +327,14 @@ class Method {
 
   // Add a formal parameter
   // Return false if there is a name conflict
-  public Variable addParam(String id, Type type) {
+  public boolean addParam(String id, Type type) {
     if (containsParam(id))
-      return null;
+      return false;
     else {
       Variable var = new Variable(id, type, c, this);
       params.addElement(var);
 
-      return var;
+      return true;
     }
   }
 
@@ -355,14 +352,14 @@ class Method {
 
   // Add a local variable
   // Return false if there is a name conflict
-  public Variable addVar(String id, Type type) {
+  public boolean addVar(String id, Type type) {
     if (vars.containsKey(id))
-      return null;
+      return false;
     else {
       Variable var = new Variable(id, type, c, this);
       vars.put(id, var);
 
-      return var;
+      return true;
     }
   }
 
