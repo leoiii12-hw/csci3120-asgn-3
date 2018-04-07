@@ -126,21 +126,21 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
 
       if (!currClass.addVar(id, t, n.token.beginLine, n.token.beginColumn)) {
         Variable conflictedVar = currClass.getVar(id);
-        System.err.printf("%s: Redeclaration (%s,%s; %s,%s)%n", id, conflictedVar.getBeginLine(), conflictedVar.getBeginColumn(), n.token.beginLine, n.token.beginColumn);
+        System.err.printf("%s: Redeclaration (%s,%s:%s; %s,%s)%n", id, conflictedVar.getBeginLine(), conflictedVar.getBeginColumn(), conflictedVar.getScopingMethod().getInternalId(), n.token.beginLine, n.token.beginColumn);
       }
     } else {
       // Add a local variable
 
       for (Variable conflictedParam : currMethod.params) {
         if (conflictedParam.getId().equals(id)) {
-          System.err.printf("%s: Redeclaration (%s,%s; %s,%s)%n", id, conflictedParam.getBeginLine(), conflictedParam.getBeginColumn(), n.token.beginLine, n.token.beginColumn);
+          System.err.printf("%s: Redeclaration (%s,%s:%s; %s,%s)%n", id, conflictedParam.getBeginLine(), conflictedParam.getBeginColumn(), conflictedParam.getScopingMethod().getInternalId(), n.token.beginLine, n.token.beginColumn);
           return null;
         }
       }
 
       if (!currMethod.addVar(id, t, n.token.beginLine, n.token.beginColumn)) {
         Variable conflictedVar = currMethod.getVar(id);
-        System.err.printf("%s: Redeclaration (%s,%s; %s,%s)%n", id, conflictedVar.getBeginLine(), conflictedVar.getBeginColumn(), n.token.beginLine, n.token.beginColumn);
+        System.err.printf("%s: Redeclaration (%s,%s:%s; %s,%s)%n", id, conflictedVar.getBeginLine(), conflictedVar.getBeginColumn(), conflictedVar.getScopingMethod().getInternalId(), n.token.beginLine, n.token.beginColumn);
       }
     }
 
@@ -194,7 +194,7 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
 
     if (!currMethod.addParam(id, t, n.token.beginLine, n.token.beginColumn)) {
       Variable param = currMethod.getParam(id);
-      System.err.printf("%s: param Redeclaration (%s,%s; %s,%s)%n", id, param.getBeginLine(), param.getBeginColumn(), n.token.beginLine, n.token.beginColumn);
+      System.err.printf("%s: Redeclaration (%s,%s:%s; %s,%s)%n", id, param.getBeginLine(), param.getBeginColumn(), param.getScopingMethod().getInternalId(), n.token.beginLine, n.token.beginColumn);
     }
 
     return null;

@@ -310,6 +310,10 @@ class Variable {
   public int getInternalId() {
     return internalId;
   }
+
+  public Method getScopingMethod() {
+    return scopingMethod;
+  }
 } // Variable
 
 // Store all properties that describe a variable
