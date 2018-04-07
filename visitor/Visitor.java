@@ -30,6 +30,7 @@ public interface Visitor {
   public void visit(ArrayLength n);
   public void visit(Call n);
   public void visit(IntegerLiteral n);
+  public void visit(FloatingPointLiteral n);
   public void visit(True n);
   public void visit(False n);
   public void visit(IdentifierExp n);

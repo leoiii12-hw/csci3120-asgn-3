@@ -3,13 +3,11 @@ package syntaxtree;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
-// e1 + e2
-public class Plus extends Exp {
-  public Exp e1, e2;
+public class FloatingPointLiteral extends Exp {
+  public double d;
 
-  public Plus(Exp ae1, Exp ae2) {
-    e1 = ae1;
-    e2 = ae2;
+  public FloatingPointLiteral(double ad) {
+    d = ad;
   }
 
   public void accept(Visitor v) {

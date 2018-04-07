@@ -3,7 +3,7 @@ options {
 }
 
 PARSER_BEGIN(MiniJavaParser)
-package myparser;
+  package myparser;
 
   import syntaxtree.*;
   public class MiniJavaParser {}
@@ -39,12 +39,11 @@ TOKEN :
 | < LT: "<" >
 | < PLUS: "+" >
 | < MINUS: "-" >
-| < AND : "&" >   
+| < AND : "&&" >
 | < NOT : "!" >   
 | < BOOLEAN: "boolean" >   
 | < DOUBLE: "double" >
 | < CLASS: "class" >
-| < INTERFACE: "interface" >
 | < ELSE: "else" >
 | < EXTENDS: "extends" >
 | < FALSE: "false" >
@@ -66,7 +65,26 @@ TOKEN :
 
 TOKEN : /* LITERALS */
 {
-  < INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|
+  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -363,86 +381,113 @@ Statement PrintStatement() :
   { return new Print(e); }
 }
 
+/*
+ * Expression syntax follows.
+ */
+
 Exp Expression() :
 { Exp e; }
 {
-  (
-  LOOKAHEAD( PrimaryExpression() "&&" )
   e=AndExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "<" )
-  e=CompareExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "+" )
-  e=PlusExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "-" )
-  e=MinusExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "*" )
-  e=TimesExpression()
-|
-  LOOKAHEAD( PrimaryExpression() "[" )
-  e=ArrayLookup()
-|
-  LOOKAHEAD( PrimaryExpression() "." "length" )
-  e=ArrayLength()
-|
-  LOOKAHEAD( PrimaryExpression() "." Identifier() "(" )
-  e=MessageSend()
-| 
-  e=PrimaryExpression()
-  )
   { return e; }
 }
 
 Exp AndExpression() :
 { Exp e1,e2; } 
 {
-  e1=PrimaryExpression() "&&" e2=PrimaryExpression()
-  { return new And(e1,e2); }
+  e1=CompareExpression()
+
+  (
+    LOOKAHEAD("&&")
+    "&&" e2=CompareExpression()
+    { e1 = new And(e1,e2); }
+  )*
+
+  { return e1; }
 }
 
 Exp CompareExpression() :
 { Exp e1,e2; } 
 {
-  e1=PrimaryExpression() "<" e2=PrimaryExpression()
-  { return new LessThan(e1,e2); }
+  e1=PlusExpression()
+
+  [
+    LOOKAHEAD("<")
+    "<" e2=PlusExpression()
+    { e1 = new LessThan(e1,e2); }
+  ]
+
+  { return e1; }
 }
 
 Exp PlusExpression() :
 { Exp e1,e2; } 
 {
-  e1=PrimaryExpression() "+" e2=PrimaryExpression()
-  { return new Plus(e1,e2); }
+  e1=MinusExpression()
+
+  (
+    LOOKAHEAD("+")
+    "+" e2=MinusExpression()
+    { e1 = new Plus(e1,e2); }
+  )*
+
+  { return e1; }
 }
 
 Exp MinusExpression() :
 { Exp e1,e2; } 
 {
-  e1=PrimaryExpression() "-" e2=PrimaryExpression()
-  { return new Minus(e1,e2); }
+  e1=TimesExpression()
+
+  (
+    LOOKAHEAD("-")
+    "-" e2=TimesExpression()
+    { e1 = new Minus(e1,e2); }
+  )*
+
+  { return e1; }
 }
 
 Exp TimesExpression() :
 { Exp e1,e2; } 
 {
-  e1=PrimaryExpression() "*" e2=PrimaryExpression()
-  { return new Times(e1,e2); }
+  e1=ArrayLookup()
+
+  (
+    LOOKAHEAD("*")
+    "*" e2=ArrayLookup()
+    { e1 = new Times(e1,e2); }
+  )*
+
+  { return e1; }
 }
 
 Exp ArrayLookup() :
 { Exp e1,e2; } 
 {
-  e1=PrimaryExpression() "[" e2=PrimaryExpression() "]"
-  { return new ArrayLookup(e1,e2); }
+  e1=ArrayLength()
+
+  (
+    LOOKAHEAD("[" ArrayLength())
+    "[" e2=ArrayLength() "]"
+    { e1 = new ArrayLookup(e1,e2); }
+  )*
+
+  { return e1; }
 }
 
 Exp ArrayLength() :
 { Exp e; }
 {
-  e=PrimaryExpression() "." "length"
-  { return new ArrayLength(e); }
+  e=MessageSend()
+
+  (
+    LOOKAHEAD("." "length")
+    "." "length"
+    { e = new ArrayLength(e); }
+  )*
+
+  { return e; }
 }
 
 Exp MessageSend() :
@@ -451,9 +496,15 @@ Exp MessageSend() :
   ExpList el = new ExpList(); 
 }
 {
-  e=PrimaryExpression() "." i=Identifier() 
-  "(" ( el=ExpressionList() )? ")"
-  { return new Call(e,i,el); }
+  e=PrimaryExpression()
+
+  (
+    LOOKAHEAD("." Identifier())
+    "." i=Identifier() "(" ( el=ExpressionList() )? ")"
+    { e = new Call(e,i,el); }
+  )*
+
+  { return e; }
 }
 
 ExpList ExpressionList() :
@@ -479,6 +530,8 @@ Exp PrimaryExpression() :
 { 
   (
   e=IntegerLiteral()
+|
+  e=FloatingPointLiteral()
 |
   e=TrueLiteral()
 |
@@ -507,6 +560,12 @@ Exp IntegerLiteral() :
   { return new IntegerLiteral(Integer.parseInt(t.image)); }
 }
 
+Exp FloatingPointLiteral() :
+{ Token t; }
+{
+  t=<FLOATING_POINT_LITERAL>
+  { return new FloatingPointLiteral(Double.parseDouble(t.image)); }
+}
 
 Exp TrueLiteral() :
 {}

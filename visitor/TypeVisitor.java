@@ -30,6 +30,7 @@ public interface TypeVisitor {
   public Type visit(ArrayLength n);
   public Type visit(Call n);
   public Type visit(IntegerLiteral n);
+  public Type visit(FloatingPointLiteral n);
   public Type visit(True n);
   public Type visit(False n);
   public Type visit(IdentifierExp n);

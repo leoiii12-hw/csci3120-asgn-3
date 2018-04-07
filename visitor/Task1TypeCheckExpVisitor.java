@@ -130,6 +130,11 @@ public class Task1TypeCheckExpVisitor extends TypeDepthFirstVisitor {
     return new IntegerType();
   }
 
+  // double d;
+  public Type visit(FloatingPointLiteral n) {
+    return new DoubleType();
+  }
+
   public Type visit(True n) {
     return new BooleanType();
   }

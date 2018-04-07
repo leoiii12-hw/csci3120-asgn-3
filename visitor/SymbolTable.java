@@ -114,14 +114,15 @@ class SymbolTable {
   public boolean compareTypes(Type t1, Type t2) {
     if (t1 == null || t2 == null) return false;
 
+    // Exact Type
     if (t1 instanceof IntegerType && t2 instanceof IntegerType)
+      return true;
+    if (t1 instanceof DoubleType && t2 instanceof DoubleType)
       return true;
     if (t1 instanceof BooleanType && t2 instanceof BooleanType)
       return true;
     if (t1 instanceof IntArrayType && t2 instanceof IntArrayType)
       return true;
-
-    // If both are classes
     if (t1 instanceof IdentifierType && t2 instanceof IdentifierType) {
       IdentifierType i1 = (IdentifierType) t1;
       IdentifierType i2 = (IdentifierType) t2;
@@ -140,6 +141,11 @@ class SymbolTable {
         }
       }
     }
+
+    // Type Promotion
+    if (t1 instanceof DoubleType && t2 instanceof IntegerType)
+      return true;
+
     return false;
   }
 
@@ -148,13 +154,13 @@ class SymbolTable {
 // Store all properties that describe a class
 class Class {
 
+  private final int beginLine;
+  private final int beginColumn;
   protected String id;      // Class name
   protected Hashtable<String, Method> methods;
   protected Hashtable<String, Variable> fields;
   protected String parent;  // Superclass's name  (null if there is no superclass)
   protected Type type;      // An instance of Type that represents this class
-  private final int beginLine;
-  private final int beginColumn;
 
   // Model a class named "id" that extend a class name "p"
   // "p" is null if class "id" does has extend any class
@@ -251,18 +257,18 @@ class Class {
 // Store all properties that describe a variable
 class Variable {
 
-  protected String id;
-  protected Type type;
-  private final Class c;
-  private final Method m;
+  private final Class scopingClass;
+  private final Method scopingMethod;
   private final int beginLine;
   private final int beginColumn;
+  protected String id;
+  protected Type type;
 
-  public Variable(String id, Type type, Class c, Method m, int beginLine, int beginColumn) {
+  public Variable(String id, Type type, Class scopingClass, Method scopingMethod, int beginLine, int beginColumn) {
     this.id = id;
     this.type = type;
-    this.c = c;
-    this.m = m;
+    this.scopingClass = scopingClass;
+    this.scopingMethod = scopingMethod;
     this.beginLine = beginLine;
     this.beginColumn = beginColumn;
   }
@@ -272,10 +278,10 @@ class Variable {
   }
 
   public String getUniqueId() {
-    if (m == null) {
-      return c.getId() + "::" + id;
+    if (scopingMethod == null) {
+      return scopingClass.getId() + "::" + id;
     } else {
-      return c.getId() + "::" + m.getId() + "::" + id;
+      return scopingClass.getId() + "::" + scopingMethod.getId() + "::" + id;
     }
   }
 
@@ -296,23 +302,22 @@ class Variable {
 // Store all properties that describe a variable
 class Method {
 
+  private final Class scopingClass;
+  private final int beginLine;
+  private final int beginColumn;
   protected String id;  // Method name
   protected Type type;  // Return type
   protected Vector<Variable> params;          // Formal parameters
   protected Hashtable<String, Variable> vars; // Local variables
 
-  private final Class scopingClass;
-  private final int beginLine;
-  private final int beginColumn;
-
   public Method(String id, Type type, Class scopingClass, int beginLine, int beginColumn) {
-    this.id = id;
-    this.type = type;
     this.scopingClass = scopingClass;
     this.beginLine = beginLine;
     this.beginColumn = beginColumn;
-    params = new Vector<Variable>();
-    vars = new Hashtable<String, Variable>();
+    this.id = id;
+    this.type = type;
+    this.params = new Vector<Variable>();
+    this.vars = new Hashtable<String, Variable>();
   }
 
   public String getId() {

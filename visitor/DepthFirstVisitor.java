@@ -200,6 +200,10 @@ public class DepthFirstVisitor implements Visitor {
   public void visit(IntegerLiteral n) {
   }
 
+  // double d;
+  public void visit(FloatingPointLiteral n) {
+  }
+
   public void visit(True n) {
   }
 

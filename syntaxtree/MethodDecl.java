@@ -1,7 +1,8 @@
 package syntaxtree;
+
 import myparser.Token;
-import visitor.Visitor;
 import visitor.TypeVisitor;
+import visitor.Visitor;
 
 public class MethodDecl {
   public Type t;
@@ -12,11 +13,17 @@ public class MethodDecl {
   public Exp e;
   public Token token;
 
-  public MethodDecl(Type at, Identifier ai, FormalList afl, VarDeclList avl, 
+  public MethodDecl(Type at, Identifier ai, FormalList afl, VarDeclList avl,
                     StatementList asl, Exp ae, Token token) {
-    t=at; i=ai; fl=afl; vl=avl; sl=asl; e=ae; this.token=token;
+    t = at;
+    i = ai;
+    fl = afl;
+    vl = avl;
+    sl = asl;
+    e = ae;
+    this.token = token;
   }
- 
+
   public void accept(Visitor v) {
     v.visit(this);
   }

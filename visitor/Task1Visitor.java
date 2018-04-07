@@ -67,13 +67,18 @@ public class Task1Visitor extends DepthFirstVisitor {
     if (this.identifier == null || currClass.getId().equals(this.identifier)) {
       System.out.printf("%s, Class", ++uniqueId);
 
+      String parentId = currClass.getParentId();
+      Class parentClass = symbolTable.getClass(parentId);
+      System.out.print(", " + parentClass.getId());
       while (true) {
-        String parentId = currClass.getParentId();
+        parentId = parentClass.getParentId();
 
         if (parentId == null) break;
 
+        parentClass = symbolTable.getClass(parentId);
         System.out.print(", " + parentId);
       }
+
       System.out.println();
     }
 

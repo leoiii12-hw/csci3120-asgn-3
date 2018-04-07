@@ -226,6 +226,11 @@ public class TypeDepthFirstVisitor implements TypeVisitor {
     return null;
   }
 
+  // double d;
+  public Type visit(FloatingPointLiteral n) {
+    return null;
+  }
+
   public Type visit(True n) {
     return null;
   }

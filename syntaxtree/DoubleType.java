@@ -1,4 +1,5 @@
 package syntaxtree;
+
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
