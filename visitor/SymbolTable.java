@@ -6,8 +6,12 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import static visitor.SymbolTable.autoIncrementalId;
+
 // The global Symbol Table that maps class name to Class
 class SymbolTable {
+
+  public static int autoIncrementalId = 0;
   private Hashtable<String, Class> hashtable;
 
   public SymbolTable() {
@@ -156,6 +160,7 @@ class Class {
 
   private final int beginLine;
   private final int beginColumn;
+  private final int internalId = ++autoIncrementalId;
   protected String id;      // Class name
   protected Hashtable<String, Method> methods;
   protected Hashtable<String, Variable> fields;
@@ -252,11 +257,16 @@ class Class {
   public int getBeginColumn() {
     return beginColumn;
   }
+
+  public int getInternalId() {
+    return internalId;
+  }
 } // Class
 
 // Store all properties that describe a variable
 class Variable {
 
+  private final int internalId = ++autoIncrementalId;
   private final Class scopingClass;
   private final Method scopingMethod;
   private final int beginLine;
@@ -297,11 +307,15 @@ class Variable {
     return type;
   }
 
+  public int getInternalId() {
+    return internalId;
+  }
 } // Variable
 
 // Store all properties that describe a variable
 class Method {
 
+  private final int internalId = ++autoIncrementalId;
   private final Class scopingClass;
   private final int beginLine;
   private final int beginColumn;
@@ -426,6 +440,10 @@ class Method {
 
   public int getBeginColumn() {
     return beginColumn;
+  }
+
+  public int getInternalId() {
+    return internalId;
   }
 } // Method
 

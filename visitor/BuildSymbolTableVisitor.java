@@ -4,7 +4,7 @@ import syntaxtree.*;
 
 public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
 
-  SymbolTable symbolTable;
+  private SymbolTable symbolTable;
 
   public BuildSymbolTableVisitor() {
     symbolTable = new SymbolTable();
