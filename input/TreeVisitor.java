@@ -15,6 +15,20 @@ class TV {
 	boolean ntb ;
 	int nti ;
 	MyVisitor v ;
+			double a;
+
+	boolean Start;
+	int Start; // Redeclaration
+			int Start3;
+
+			Start2 = 1; // Unknown identifier
+
+  Start3 = 100;
+
+	a = 1 * 1;
+	a = Start3 * Start3;
+
+	Start = a;
 
 	root = new Tree();
 	ntb = root.Init(16);

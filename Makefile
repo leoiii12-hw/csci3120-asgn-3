@@ -15,9 +15,11 @@ VISITOR_CLASS = $(VISITOR:.java=.class)
 
 
 
-all: Main.class
+all: Task1Main.class Task2Main.class
 
-Main.class: Main.java $(PARSER) 
+Task1Main.class: Task1Main.java $(PARSER)
+
+Task2Main.class: Task2Main.java $(PARSER)
 
 %.class: %.java
 	javac $(JAVAC_OPTIONS) $<
@@ -34,8 +36,8 @@ clean:
 	rm -rf out
 
 test1:
-	java Main < input/Factorial.java
+	java Task1Main null < input/TreeVisitor.java
 
 test2:
-	java Main < input/BinarySearch.java
+	java Task2Main < input/TreeVisitor.java
 
