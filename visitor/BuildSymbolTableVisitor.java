@@ -68,9 +68,9 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
   public Type visit(ClassDeclSimple n) {
     String id = n.i.toString();
 
-    if (!symbolTable.addClass(id, null, n.token.beginLine, n.token.beginColumn)) {
+    if (!symbolTable.addClass(id, null, n.getBeginLine(), n.getBeginColumn())) {
       Class conflictedClass = symbolTable.getClass(id);
-      System.err.printf("%s: class Redeclaration (%s,%s; %s,%s)%n", id, conflictedClass.getBeginLine(), conflictedClass.getBeginColumn(), n.token.beginLine, n.token.beginColumn);
+      System.err.printf("%s: class Redeclaration (%s,%s; %s,%s)%n", id, conflictedClass.getBeginLine(), conflictedClass.getBeginColumn(), n.getBeginLine(), n.getBeginColumn());
     }
 
     // Entering a new class scope (no need to explicitly leave a class scope)
@@ -95,9 +95,9 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
   public Type visit(ClassDeclExtends n) {
     String id = n.i.toString();
 
-    if (!symbolTable.addClass(id, n.j.toString(), n.token.beginLine, n.token.beginColumn)) {
+    if (!symbolTable.addClass(id, n.j.toString(), n.getBeginLine(), n.getBeginColumn())) {
       Class conflictedClass = symbolTable.getClass(id);
-      System.err.printf("%s: class Redeclaration (%s,%s; %s,%s)%n", id, conflictedClass.getBeginLine(), conflictedClass.getBeginColumn(), n.token.beginLine, n.token.beginColumn);
+      System.err.printf("%s: class Redeclaration (%s,%s; %s,%s)%n", id, conflictedClass.getBeginLine(), conflictedClass.getBeginColumn(), n.getBeginLine(), n.getBeginColumn());
     }
 
     // Entering a new class scope (no need to explicitly leave a class scope)
@@ -159,9 +159,9 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
     Type t = n.t.accept(this);
     String id = n.i.toString();
 
-    if (!currClass.addMethod(id, t, n.token.beginLine, n.token.beginColumn)) {
+    if (!currClass.addMethod(id, t, n.getBeginLine(), n.getBeginColumn())) {
       Method conflictedMethod = currClass.getMethod(id);
-      System.err.printf("%s: method Redeclaration (%s,%s; %s,%s)%n", id, conflictedMethod.getBeginLine(), conflictedMethod.getBeginColumn(), n.token.beginLine, n.token.beginColumn);
+      System.err.printf("%s: method Redeclaration (%s,%s; %s,%s)%n", id, conflictedMethod.getBeginLine(), conflictedMethod.getBeginColumn(), n.getBeginLine(), n.getBeginColumn());
     }
 
     // Entering a method scope 

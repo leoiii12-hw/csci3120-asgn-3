@@ -30,6 +30,7 @@ public class Task2Main {
       Task2Visitor task2Visitor = new Task2Visitor(buildSymTab.getSymTab());
       root.accept(task2Visitor);
 
+      System.out.println("Done all checking.");
     } catch (ParseException e) {
       System.out.println(e.toString());
     }

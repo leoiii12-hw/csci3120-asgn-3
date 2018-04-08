@@ -1,5 +1,6 @@
 package syntaxtree;
 
+import myparser.Token;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 

@@ -32,6 +32,9 @@ public class Task1Visitor extends DepthFirstVisitor {
     String i1 = n.i1.toString();
     currClass = symbolTable.getClass(i1);
 
+    if (this.identifier == null || currClass.getId().equals(this.identifier))
+      System.out.printf("%s, Class, (%s,%s)%n", currClass.getInternalId(), n.getBeginLine(), n.getBeginColumn());
+
     n.i2.accept(this);
     n.s.accept(this);
   }
@@ -44,7 +47,7 @@ public class Task1Visitor extends DepthFirstVisitor {
     currClass = symbolTable.getClass(id);
 
     if (this.identifier == null || currClass.getId().equals(this.identifier))
-      System.out.printf("%s, Class, (%s,%s)%n", currClass.getInternalId(), n.token.beginLine, n.token.beginColumn);
+      System.out.printf("%s, Class, (%s,%s)%n", currClass.getInternalId(), n.getBeginLine(), n.getBeginColumn());
 
     for (int i = 0; i < n.vl.size(); i++) {
       n.vl.elementAt(i).accept(this);
@@ -63,7 +66,7 @@ public class Task1Visitor extends DepthFirstVisitor {
     currClass = symbolTable.getClass(id);
 
     if (this.identifier == null || currClass.getId().equals(this.identifier)) {
-      System.out.printf("%s, Class, (%s,%s)", currClass.getInternalId(), n.token.beginLine, n.token.beginColumn);
+      System.out.printf("%s, Class, (%s,%s)", currClass.getInternalId(), n.getBeginLine(), n.getBeginColumn());
 
       String parentId = currClass.getParentId();
       Class parentClass = symbolTable.getClass(parentId);
@@ -84,7 +87,7 @@ public class Task1Visitor extends DepthFirstVisitor {
       Variable var = entry.getValue();
 
       if (this.identifier == null || var.id.equals(this.identifier)) {
-        System.out.printf("%s, Data member, %s, %s, (%s,%s)%n", var.getInternalId(), var.getType(), currClass, n.token.beginLine, n.token.beginColumn);
+        System.out.printf("%s, Data member, %s, %s, (%s,%s)%n", var.getInternalId(), var.getType(), currClass, n.getBeginLine(), n.getBeginColumn());
       }
     }
 
@@ -116,12 +119,12 @@ public class Task1Visitor extends DepthFirstVisitor {
     currMethod = currClass.getMethod(id);
 
     if (this.identifier == null || currMethod.id.equals(this.identifier)) {
-      System.out.printf("%s, %s, %s (%s), (%s,%s)%n", currMethod.getInternalId(), currClass.getId(), currMethod.getType(), currMethod.getParamsAsString(), n.token.beginLine, n.token.beginColumn);
+      System.out.printf("%s, %s, %s (%s), (%s,%s)%n", currMethod.getInternalId(), currClass.getId(), currMethod.getType(), currMethod.getParamsAsString(), n.getBeginLine(), n.getBeginColumn());
     }
 
     for (Variable param : currMethod.params) {
       if (this.identifier == null || param.id.equals(this.identifier)) {
-        System.out.printf("%s, Param, %s, %s, (%s,%s:%s)%n", param.getInternalId(), param.getType(), currMethod.getUniqueId(), n.token.beginLine, n.token.beginColumn, currMethod.getInternalId());
+        System.out.printf("%s, Param, %s, %s, (%s,%s:%s)%n", param.getInternalId(), param.getType(), currMethod.getUniqueId(), n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
       }
     }
 
@@ -129,7 +132,7 @@ public class Task1Visitor extends DepthFirstVisitor {
       Variable var = entry.getValue();
 
       if (this.identifier == null || var.id.equals(this.identifier)) {
-        System.out.printf("%s, Local, %s, %s, (%s,%s:%s)%n", var.getInternalId(), var.getType(), currMethod.getUniqueId(), n.token.beginLine, n.token.beginColumn, currMethod.getInternalId());
+        System.out.printf("%s, Local, %s, %s, (%s,%s:%s)%n", var.getInternalId(), var.getType(), currMethod.getUniqueId(), n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
       }
     }
 
@@ -193,7 +196,7 @@ public class Task1Visitor extends DepthFirstVisitor {
     Type t2 = n.e.accept(new Task1TypeCheckExpVisitor());
 
     if (t1 == null) {
-      System.err.printf("%s: Unknown identifier (%s,%s:%s)%n", n.i.toString(), n.token.beginLine, n.token.beginColumn, currMethod.getInternalId());
+      System.err.printf("%s: Unknown identifier (%s,%s:%s)%n", n.i.toString(), n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
       return;
     }
 
@@ -209,21 +212,22 @@ public class Task1Visitor extends DepthFirstVisitor {
     Type typeI = symbolTable.getVarType(currMethod, currClass, n.i.toString());
 
     if (typeI == null) {
-      System.err.printf("%s: Unknown identifier (%s,%s:%s)%n", n.i.toString(), n.token.beginLine, n.token.beginColumn, currMethod.getInternalId());
+      System.err.printf("%s: Unknown identifier (%s,%s:%s)%n", n.i.toString(), n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
       return;
     }
 
     if (!(typeI instanceof IntArrayType)) {
-      System.out.println("The identifier in an array assignment must be of type int []");
+      System.out.printf("The identifier in an array assignment must be of type int [] (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
       System.exit(-1);
     }
 
     if (!(n.e1.accept(new Task1TypeCheckExpVisitor()) instanceof IntegerType)) {
-      System.out.println("The first expression in an array assignment must be of type int");
+      System.out.printf("The first expression in an array assignment must be of type int (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
       System.exit(-1);
     }
+
     if (!(n.e1.accept(new Task1TypeCheckExpVisitor()) instanceof IntegerType)) {
-      System.out.println("The second expression in an array assignment must be of type int");
+      System.out.printf("The second expression in an array assignment must be of type int (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
       System.exit(-1);
     }
   }

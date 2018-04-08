@@ -182,7 +182,7 @@ ClassDecl ClassDeclarationSimple() :
   "class" { Token tk = token; } i=Identifier() "{" ( v=VarDeclaration()    { vl.addElement(v); } )*
                              ( m=MethodDeclaration() { ml.addElement(m); } )* 
                        "}"
-  { return new ClassDeclSimple(i,vl,ml,tk); }
+  { ClassDeclSimple cds=new ClassDeclSimple(i,vl,ml); inject_token(cds,tk); return cds; }
 }
 
 ClassDecl ClassDeclarationExtends() :
@@ -197,7 +197,7 @@ ClassDecl ClassDeclarationExtends() :
                        "{"   ( v=VarDeclaration()    { vl.addElement(v); } )* 
                              ( m=MethodDeclaration() { ml.addElement(m); } )* 
                        "}"
-  { return new ClassDeclExtends(i1,i2,vl,ml,tk); }
+  { ClassDeclExtends cde=new ClassDeclExtends(i1,i2,vl,ml); inject_token(cde,tk); return cde;  }
 }
 
 VarDecl VarDeclaration() :  
@@ -225,7 +225,7 @@ MethodDecl MethodDeclaration() :
   "(" ( fl=FormalParameterList() )? ")"   
   "{" ( LOOKAHEAD(2) v=VarDeclaration() { vl.addElement(v); } )* 
       ( s=Statement() { sl.addElement(s); } )* "return" e=Expression() ";" "}"
-  { return new MethodDecl(t,i,fl,vl,sl,e,tk); }
+  { MethodDecl md=new MethodDecl(t,i,fl,vl,sl,e); inject_token(md,tk); return md; }
 }
 
 FormalList FormalParameterList() :
@@ -343,8 +343,8 @@ Statement AssignmentStatement() :
   Exp e; 
 }
 {
-  i=Identifier() { Token t = token; } "=" e=Expression() ";"
-  { return new Assign(i,e,t); }
+  i=Identifier() { Token tk=token; } "=" e=Expression() ";"
+  { Assign as=new Assign(i,e); inject_token(as,tk); return as; }
 }
 
 Statement ArrayAssignmentStatement() :
@@ -352,8 +352,8 @@ Statement ArrayAssignmentStatement() :
   Exp e1,e2;
 }
 {
-  i=Identifier() { Token t = token; } "[" e1=Expression() "]" "=" e2=Expression() ";"
-  { return new ArrayAssign(i,e1,e2,t); }
+  i=Identifier() { Token tk=token; } "[" e1=Expression() "]" "=" e2=Expression() ";"
+  { ArrayAssign aa=new ArrayAssign(i,e1,e2,t); inject_token(aa,tk); return aa; }
 }
 
 Statement IfStatement() :
@@ -399,8 +399,8 @@ Exp AndExpression() :
 
   (
     LOOKAHEAD("&&")
-    "&&" e2=CompareExpression()
-    { e1 = new And(e1,e2); }
+    "&&" { Token tk=token; } e2=CompareExpression()
+    { e1 = new And(e1,e2); inject_token(e1,tk); }
   )*
 
   { return e1; }
@@ -413,8 +413,8 @@ Exp CompareExpression() :
 
   [
     LOOKAHEAD("<")
-    "<" e2=PlusExpression()
-    { e1 = new LessThan(e1,e2); }
+    "<" { Token tk=token; } e2=PlusExpression()
+    { e1 = new LessThan(e1,e2); inject_token(e1,tk); }
   ]
 
   { return e1; }
@@ -427,8 +427,8 @@ Exp PlusExpression() :
 
   (
     LOOKAHEAD("+")
-    "+" e2=MinusExpression()
-    { e1 = new Plus(e1,e2); }
+    "+" { Token tk=token; } e2=MinusExpression()
+    { e1 = new Plus(e1,e2); inject_token(e1,tk); }
   )*
 
   { return e1; }
@@ -441,8 +441,8 @@ Exp MinusExpression() :
 
   (
     LOOKAHEAD("-")
-    "-" e2=TimesExpression()
-    { e1 = new Minus(e1,e2); }
+    "-" { Token tk=token; } e2=TimesExpression()
+    { e1 = new Minus(e1,e2); inject_token(e1,tk); }
   )*
 
   { return e1; }
@@ -455,8 +455,8 @@ Exp TimesExpression() :
 
   (
     LOOKAHEAD("*")
-    "*" e2=ArrayLookup()
-    { e1 = new Times(e1,e2); }
+    "*" { Token tk=token; } e2=ArrayLookup()
+    { e1 = new Times(e1,e2); inject_token(e1,tk); }
   )*
 
   { return e1; }
@@ -469,8 +469,8 @@ Exp ArrayLookup() :
 
   (
     LOOKAHEAD("[" ArrayLength())
-    "[" e2=ArrayLength() "]"
-    { e1 = new ArrayLookup(e1,e2); }
+    "[" { Token tk=token; } e2=ArrayLength() "]"
+    { e1 = new ArrayLookup(e1,e2); inject_token(e1,tk); }
   )*
 
   { return e1; }
@@ -483,8 +483,8 @@ Exp ArrayLength() :
 
   (
     LOOKAHEAD("." "length")
-    "." "length"
-    { e = new ArrayLength(e); }
+    "." { Token tk=token; } "length"
+    { e = new ArrayLength(e); inject_token(e,tk); }
   )*
 
   { return e; }
@@ -500,8 +500,8 @@ Exp MessageSend() :
 
   (
     LOOKAHEAD("." Identifier())
-    "." i=Identifier() "(" ( el=ExpressionList() )? ")"
-    { e = new Call(e,i,el); }
+    "." { Token tk=token; } i=Identifier() "(" ( el=ExpressionList() )? ")"
+    { e = new Call(e,i,el); inject_token(e,tk); }
   )*
 
   { return e; }
@@ -612,8 +612,8 @@ Exp AllocationExpression() :
 Exp NotExpression() :
 { Exp e; }
 {
-  "!" e=Expression() 
-  { return new Not(e); }
+  "!" { Token tk=token; } e=Expression()
+  { Not not=new Not(e); inject_token(not,tk); return not; }
 }
 
 Exp BracketExpression() :
@@ -630,3 +630,7 @@ Identifier Identifier() :
   { return new Identifier(t.image); }
 }
 
+JAVACODE
+void inject_token(HasToken hasToken, Token token) {
+  hasToken.setToken(token);
+}

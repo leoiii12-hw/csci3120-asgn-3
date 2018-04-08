@@ -3,7 +3,7 @@ package syntaxtree;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
-public class MainClass {
+public class MainClass extends HasToken {
   public Identifier i1, i2;
   public Statement s;
 

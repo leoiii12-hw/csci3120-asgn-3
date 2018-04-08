@@ -82,8 +82,7 @@ class SymbolTable {
     Class c = getClass(cName);
 
     if (c == null) {
-      System.out.println("Class " + cName + " not defined");
-      System.exit(0); // Panic!
+      return null;
     }
 
     // Try to find the declared method along the class hierarchy
@@ -97,9 +96,6 @@ class SymbolTable {
       }
     }
 
-    System.out.println("Method " + id + " not defined in class " + cName);
-
-    System.exit(0);
     return null;
   }
 

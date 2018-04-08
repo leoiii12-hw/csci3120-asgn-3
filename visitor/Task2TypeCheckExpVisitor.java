@@ -7,87 +7,164 @@ public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
   // Exp e1,e2;
   public Type visit(And n) {
     if (!(n.e1.accept(this) instanceof BooleanType)) {
-      System.out.println("Left side of And must be of type integer");
-      System.exit(-1);
+      System.err.printf("Left side of AND must be of type boolean (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
     if (!(n.e2.accept(this) instanceof BooleanType)) {
-      System.out.println("Right side of And must be of type integer");
-      System.exit(-1);
+      System.err.printf("Right side of AND must be of type boolean (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
     return new BooleanType();
   }
 
   // Exp e1,e2;
   public Type visit(LessThan n) {
-    if (!(n.e1.accept(this) instanceof IntegerType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+    if (!(n.e1.accept(this) instanceof IntegerType || n.e1.accept(this) instanceof DoubleType)) {
+      System.err.printf("Left side of LESS THAN must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
-    if (!(n.e2.accept(this) instanceof IntegerType)) {
-      System.out.println("Right side of LessThan must be of type integer");
-      System.exit(-1);
+
+    if (!(n.e2.accept(this) instanceof IntegerType || n.e2.accept(this) instanceof DoubleType)) {
+      System.err.printf("Right side of LESS THAN must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
-    return new BooleanType();
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof IntegerType) {
+      return new BooleanType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof IntegerType) {
+      return new BooleanType();
+    }
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof DoubleType) {
+      return new BooleanType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof DoubleType) {
+      return new BooleanType();
+    }
+
+    return null;
   }
 
   // Exp e1,e2;
   public Type visit(Plus n) {
-    if (!(n.e1.accept(this) instanceof IntegerType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+    if (!(n.e1.accept(this) instanceof IntegerType || n.e1.accept(this) instanceof DoubleType)) {
+      System.err.printf("Left side of PLUS must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
-    if (!(n.e2.accept(this) instanceof IntegerType)) {
-      System.out.println("Right side of LessThan must be of type integer");
-      System.exit(-1);
+
+    if (!(n.e2.accept(this) instanceof IntegerType || n.e2.accept(this) instanceof DoubleType)) {
+      System.err.printf("Right side of PLUS must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
-    return new IntegerType();
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof IntegerType) {
+      return new IntegerType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof IntegerType) {
+      return new DoubleType();
+    }
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof DoubleType) {
+      return new DoubleType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof DoubleType) {
+      return new DoubleType();
+    }
+
+    return null;
   }
 
   // Exp e1,e2;
   public Type visit(Minus n) {
-    if (!(n.e1.accept(this) instanceof IntegerType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+    if (!(n.e1.accept(this) instanceof IntegerType || n.e1.accept(this) instanceof DoubleType)) {
+      System.err.printf("Left side of MINUS must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
-    if (!(n.e2.accept(this) instanceof IntegerType)) {
-      System.out.println("Right side of LessThan must be of type integer");
-      System.exit(-1);
+
+    if (!(n.e2.accept(this) instanceof IntegerType || n.e2.accept(this) instanceof DoubleType)) {
+      System.err.printf("Right side of MINUS must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
-    return new IntegerType();
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof IntegerType) {
+      return new IntegerType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof IntegerType) {
+      return new DoubleType();
+    }
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof DoubleType) {
+      return new DoubleType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof DoubleType) {
+      return new DoubleType();
+    }
+
+    return null;
   }
 
   // Exp e1,e2;
   public Type visit(Times n) {
-    if (!(n.e1.accept(this) instanceof IntegerType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+    if (!(n.e1.accept(this) instanceof IntegerType || n.e1.accept(this) instanceof DoubleType)) {
+      System.err.printf("Left side of MINUS must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
-    if (!(n.e2.accept(this) instanceof IntegerType)) {
-      System.out.println("Right side of LessThan must be of type integer");
-      System.exit(-1);
+
+    if (!(n.e2.accept(this) instanceof IntegerType || n.e2.accept(this) instanceof DoubleType)) {
+      System.err.printf("Right side of MINUS must be either integer or double (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof IntegerType) {
+      return new IntegerType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof IntegerType) {
+      return new DoubleType();
+    }
+
+    if (n.e1.accept(this) instanceof IntegerType && n.e2.accept(this) instanceof DoubleType) {
+      return new DoubleType();
+    }
+
+    if (n.e1.accept(this) instanceof DoubleType && n.e2.accept(this) instanceof DoubleType) {
+      return new DoubleType();
+    }
+
     return new IntegerType();
   }
 
   // Exp e1,e2;
   public Type visit(ArrayLookup n) {
     if (!(n.e1.accept(this) instanceof IntArrayType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+      System.out.printf("Left side of ArrayLookup must be of type integer (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
     if (!(n.e2.accept(this) instanceof IntegerType)) {
-      System.out.println("Right side of LessThan must be of type integer");
-      System.exit(-1);
+      System.out.printf("Right side of ArrayLookup must be of type integer (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
     return new IntegerType();
   }
 
   // Exp e;
   public Type visit(ArrayLength n) {
     if (!(n.e.accept(this) instanceof IntArrayType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+      System.out.printf("Left side of ArrayLength must be of type integer (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
     return new IntegerType();
   }
 
@@ -95,34 +172,32 @@ public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
   // Identifier i;
   // ExpList el;
   public Type visit(Call n) {
+    String methodId = n.i.toString();
+    String classId = ((IdentifierType) n.e.accept(this)).s;
 
     if (!(n.e.accept(this) instanceof IdentifierType)) {
-      System.out.println("method " + n.i.toString()
-          + "called  on something that is not a" +
-          " class or Object.");
-      System.exit(-1);
+      System.err.printf("Method %s should be called on Class or Object, while %s is not a valid class (%s,%s:%s)%n", methodId, classId, n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
 
-    String mname = n.i.toString();
-    String cname = ((IdentifierType) n.e.accept(this)).s;
+    Method calledMethod = Task2Visitor.symbolTable.getMethod(methodId, classId);
 
-    Method calledMethod = Task2Visitor.symbolTable.getMethod(mname, cname);
+    if (calledMethod == null) {
+      System.err.printf("Method %s not defined in %s (%s,%s:%s)%n", methodId, classId, n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
+    }
 
     for (int i = 0; i < n.el.size(); i++) {
-      Type t1 = null;
-      Type t2 = null;
+      Type t1 = calledMethod.getParamAt(i) != null ? calledMethod.getParamAt(i).getType() : null;
+      Type t2 =  n.el.elementAt(i).accept(this);
 
-      if (calledMethod.getParamAt(i) != null)
-        t1 = calledMethod.getParamAt(i).getType();
-      t2 = n.el.elementAt(i).accept(this);
       if (!Task2Visitor.symbolTable.compareTypes(t1, t2)) {
-        System.out.println("Type Error in arguments passed to " +
-            cname + "." + mname);
-        System.exit(-1);
+        System.err.printf("Passed arguments not matched with the definition %s (%s,%s:%s)%n", calledMethod.getUniqueId(), n.getToken().next.next.beginLine, n.getToken().next.next.beginColumn, Task2Visitor.currMethod.getInternalId());
+        break;
       }
     }
 
-    return Task2Visitor.symbolTable.getMethodType(mname, cname);
+    return Task2Visitor.symbolTable.getMethodType(methodId, classId);
   }
 
   // int i;
@@ -155,9 +230,10 @@ public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
   // Exp e;
   public Type visit(NewArray n) {
     if (!(n.e.accept(this) instanceof IntegerType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+      System.err.printf("NewArray operand must be of type boolean (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
     return new IntArrayType();
   }
 
@@ -169,17 +245,11 @@ public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
   // Exp e;
   public Type visit(Not n) {
     if (!(n.e.accept(this) instanceof BooleanType)) {
-      System.out.println("Left side of LessThan must be of type integer");
-      System.exit(-1);
+      System.err.printf("Not operand must be of type boolean (%s,%s:%s)%n", n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
+      return null;
     }
+
     return new BooleanType();
   }
 
 }
-//Task2Visitor.
-
-
-
-
-
-
