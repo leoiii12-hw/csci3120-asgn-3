@@ -94,7 +94,7 @@ public class Task2Visitor extends DepthFirstVisitor {
     }
 
     if (symbolTable.compareTypes(retType, n.e.accept(new Task2TypeCheckExpVisitor())) == false) {
-      System.err.printf("Wrong return type for method %s (%s,%s:%s)%n", currMethod.getUniqueId(), n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
+      System.err.printf("Wrong return type for method %s (%s,%s)%n", currMethod.getUniqueId(), n.getBeginLine(), n.getBeginColumn());
     }
   }
 

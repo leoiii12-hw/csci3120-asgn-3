@@ -57,7 +57,7 @@ class TV {
     int_1 = 100.1;
     unknownIdentifier_1 = 1;
 
-    // Mixed integer and double
+    // Mixed integer and double in computation
     double_1 = this.getInt() + this.getInt() + this.getInt() * 1.0 - this.getInt() - this.getDouble();
 
     // Compare both integer and double

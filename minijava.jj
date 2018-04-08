@@ -500,7 +500,7 @@ Exp MessageSend() :
 
   (
     LOOKAHEAD("." Identifier())
-    "." { Token tk=token; } i=Identifier() "(" ( el=ExpressionList() )? ")"
+    { Token tk=token; } "." i=Identifier() "(" ( el=ExpressionList() )? ")"
     { e = new Call(e,i,el); inject_token(e,tk); }
   )*
 

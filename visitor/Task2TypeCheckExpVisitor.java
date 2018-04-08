@@ -1,5 +1,6 @@
 package visitor;
 
+import myparser.Token;
 import syntaxtree.*;
 
 public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
@@ -189,10 +190,21 @@ public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
 
     for (int i = 0; i < n.el.size(); i++) {
       Type t1 = calledMethod.getParamAt(i) != null ? calledMethod.getParamAt(i).getType() : null;
-      Type t2 =  n.el.elementAt(i).accept(this);
+      Type t2 = n.el.elementAt(i).accept(this);
 
       if (!Task2Visitor.symbolTable.compareTypes(t1, t2)) {
-        System.err.printf("Passed arguments not matched with the definition %s (%s,%s:%s)%n", calledMethod.getUniqueId(), n.getToken().next.next.beginLine, n.getToken().next.next.beginColumn, Task2Visitor.currMethod.getInternalId());
+        Token token = n.getToken();
+
+        // Find token next to (
+        while (true) {
+          if (token.image.equals("(")) {
+            break;
+          }
+
+          token = token.next;
+        }
+
+        System.err.printf("Passed arguments not matched with the definition %s (%s,%s:%s)%n", calledMethod.getUniqueId(), token.beginLine, token.beginColumn + 1, Task2Visitor.currMethod.getInternalId());
         break;
       }
     }
