@@ -22,7 +22,7 @@ class TV {
     return true;
   }
 
-  public int undefinedMethod() {
+  public int method1() {
     return 1;
   }
 
@@ -69,7 +69,7 @@ class TV {
     double_1 = this.getInt() + this.getBoolean();
 
     int_1 = this.undefinedMethod();
-    int_1 = this.undefinedMethod(123);
+    int_1 = this.method1(123);
 
     root = new Tree();
     ntb = root.Init(16);
