@@ -353,7 +353,7 @@ Statement ArrayAssignmentStatement() :
 }
 {
   i=Identifier() { Token tk=token; } "[" e1=Expression() "]" "=" e2=Expression() ";"
-  { ArrayAssign aa=new ArrayAssign(i,e1,e2,t); inject_token(aa,tk); return aa; }
+  { ArrayAssign aa=new ArrayAssign(i,e1,e2); inject_token(aa,tk); return aa; }
 }
 
 Statement IfStatement() :

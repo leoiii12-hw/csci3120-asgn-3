@@ -36,7 +36,7 @@ clean:
 	rm -rf out
 
 test1:
-	java Task1Main null < input/TreeVisitor.java
+	java Task1Main null < input/Factorial.java
 
 test2:
 	java Task2Main < input/TreeVisitor.java
