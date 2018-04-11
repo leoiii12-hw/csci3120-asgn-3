@@ -30,6 +30,11 @@ class TV {
     return 1.0;
   }
 
+  // Overloading
+  public int Start(int a) {
+    return a;
+  }
+
   public int Start() {
     Tree root;
     boolean ntb;
@@ -69,7 +74,7 @@ class TV {
     double_1 = this.getInt() + this.getBoolean();
 
     int_1 = this.undefinedMethod();
-    int_1 = this.method1(123);
+    int_1 = this.method1();
 
     root = new Tree();
     ntb = root.Init(16);
