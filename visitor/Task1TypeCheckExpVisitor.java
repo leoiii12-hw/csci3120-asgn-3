@@ -1,6 +1,8 @@
 package visitor;
 import syntaxtree.*;
 
+import java.util.ArrayList;
+
 public class Task1TypeCheckExpVisitor extends TypeDepthFirstVisitor {
    
 
@@ -106,11 +108,16 @@ public class Task1TypeCheckExpVisitor extends TypeDepthFirstVisitor {
     String mname = n.i.toString();    
     String cname = ((IdentifierType) n.e.accept(this)).s;
 
-    Method calledMethod = Task1Visitor.symbolTable.getMethod(mname,cname);
-    
-    for ( int i = 0; i < n.el.size(); i++ ) {     	
-	Type t1 =null;  
-	Type t2 =null;  
+    ArrayList<Type> types = new ArrayList<>();
+    for (int i = 0; i < n.el.size(); i++) {
+      types.add(n.el.elementAt(i).accept(this));
+    }
+
+    Method calledMethod = Task1Visitor.symbolTable.getMethod(types, mname,cname);
+
+    for ( int i = 0; i < n.el.size(); i++ ) {
+	Type t1 =null;
+	Type t2 =null;
 
 	if (calledMethod.getParamAt(i)!=null)
 	    t1 = calledMethod.getParamAt(i).getType();
@@ -118,11 +125,11 @@ public class Task1TypeCheckExpVisitor extends TypeDepthFirstVisitor {
 	if (!Task1Visitor.symbolTable.compareTypes(t1,t2)){
 	    System.out.println("Type Error in arguments passed to " +
 			       cname+"." +mname);
-	    System.exit(-1);  
-	}	    
+	    System.exit(-1);
+	}
     }
 
-    return Task1Visitor.symbolTable.getMethodType(mname,cname);
+    return calledMethod.getType();
   }
 
   // int i;

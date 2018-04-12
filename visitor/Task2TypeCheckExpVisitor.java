@@ -3,6 +3,8 @@ package visitor;
 import myparser.Token;
 import syntaxtree.*;
 
+import java.util.ArrayList;
+
 public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
 
   // Exp e1,e2;
@@ -181,13 +183,18 @@ public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
       return null;
     }
 
-    Method calledMethod = Task2Visitor.symbolTable.getMethod(methodId, classId);
+    ArrayList<Type> paramTypes = new ArrayList<>();
+    for (int i = 0; i < n.el.size(); i++) {
+      paramTypes.add(n.el.elementAt(i).accept(this));
+    }
+    Method calledMethod = Task2Visitor.symbolTable.getMethod(paramTypes, methodId, classId);
 
     if (calledMethod == null) {
       System.err.printf("Method %s not defined in %s (%s,%s:%s)%n", methodId, classId, n.getBeginLine(), n.getBeginColumn(), Task2Visitor.currMethod.getInternalId());
       return null;
     }
 
+    // Should be not necessary
     for (int i = 0; i < n.el.size(); i++) {
       Type t1 = calledMethod.getParamAt(i) != null ? calledMethod.getParamAt(i).getType() : null;
       Type t2 = n.el.elementAt(i).accept(this);
@@ -205,11 +212,11 @@ public class Task2TypeCheckExpVisitor extends TypeDepthFirstVisitor {
         }
 
         System.err.printf("Passed arguments not matched with the definition %s (%s,%s:%s)%n", calledMethod.getUniqueId(), token.beginLine, token.beginColumn + 1, Task2Visitor.currMethod.getInternalId());
-        break;
+        return null;
       }
     }
 
-    return Task2Visitor.symbolTable.getMethodType(methodId, classId);
+    return calledMethod.getType();
   }
 
   // int i;

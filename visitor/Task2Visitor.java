@@ -2,6 +2,9 @@ package visitor;
 
 import syntaxtree.*;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Task2Visitor extends DepthFirstVisitor {
 
   static Class currClass;
@@ -80,7 +83,12 @@ public class Task2Visitor extends DepthFirstVisitor {
   public void visit(MethodDecl n) {
     n.t.accept(this);
     String id = n.i.toString();
-    currMethod = currClass.getMethod(id);
+
+    ArrayList<Type> paramTypes = new ArrayList<>();
+    for (int i = 0; i < n.fl.size(); i++) {
+      paramTypes.add(n.fl.elementAt(i).t);
+    }
+    currMethod = currClass.getMethod(paramTypes, id);
 
     Type retType = currMethod.getType();
     for (int i = 0; i < n.fl.size(); i++) {

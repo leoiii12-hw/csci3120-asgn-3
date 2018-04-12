@@ -83,6 +83,7 @@ b. The assumptions you make, if any.
 1. All type errors will not stop the type checking.
 2. Redeclared variable will not override the first declared variable.
 3. All type checking errors are outputted to "System.err".
+4. Done overloading. (Bonus)
 
 
 c. Description of the input files you used to test your programs.
@@ -96,6 +97,7 @@ I have added more test cases in the ./input/TreeVisitor.java.
 7. Undefined method
 8. Called method with wrong parameters
 9. Redeclared variable assignment (Assumption 2)
+10. Overloading (Bonus)
 
 
 d. Acknowledgement of third party code, files, and library (besides those included in chap4.zip) you used in your solution.

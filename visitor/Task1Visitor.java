@@ -2,6 +2,7 @@ package visitor;
 
 import syntaxtree.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Task1Visitor extends DepthFirstVisitor {
@@ -49,6 +50,14 @@ public class Task1Visitor extends DepthFirstVisitor {
     if (this.identifier == null || currClass.getId().equals(this.identifier))
       System.out.printf("%s, Class, (%s,%s)%n", currClass.getInternalId(), n.getBeginLine(), n.getBeginColumn());
 
+    for (Map.Entry<String, Variable> entry : currClass.fields.entrySet()) {
+      Variable var = entry.getValue();
+
+      if (this.identifier == null || var.id.equals(this.identifier)) {
+        System.out.printf("%s, Data member, %s, %s, (%s,%s)%n", var.getInternalId(), var.getType(), currClass.getId(), var.getBeginLine(), var.getBeginColumn());
+      }
+    }
+
     for (int i = 0; i < n.vl.size(); i++) {
       n.vl.elementAt(i).accept(this);
     }
@@ -87,7 +96,7 @@ public class Task1Visitor extends DepthFirstVisitor {
       Variable var = entry.getValue();
 
       if (this.identifier == null || var.id.equals(this.identifier)) {
-        System.out.printf("%s, Data member, %s, %s, (%s,%s)%n", var.getInternalId(), var.getType(), currClass, n.getBeginLine(), n.getBeginColumn());
+        System.out.printf("%s, Data member, %s, %s, (%s,%s)%n", var.getInternalId(), var.getType(), currClass.getId(), var.getBeginLine(), var.getBeginColumn());
       }
     }
 
@@ -116,7 +125,12 @@ public class Task1Visitor extends DepthFirstVisitor {
   public void visit(MethodDecl n) {
     n.t.accept(this);
     String id = n.i.toString();
-    currMethod = currClass.getMethod(id);
+
+    ArrayList<Type> paramTypes = new ArrayList<>();
+    for (int i = 0; i < n.fl.size(); i++) {
+      paramTypes.add(n.fl.elementAt(i).t);
+    }
+    currMethod = currClass.getMethod(paramTypes, id);
 
     if (this.identifier == null || currMethod.id.equals(this.identifier)) {
       System.out.printf("%s, %s, %s (%s), (%s,%s)%n", currMethod.getInternalId(), currClass.getId(), currMethod.getType(), currMethod.getParamsAsString(), n.getBeginLine(), n.getBeginColumn());
@@ -132,7 +146,7 @@ public class Task1Visitor extends DepthFirstVisitor {
       Variable var = entry.getValue();
 
       if (this.identifier == null || var.id.equals(this.identifier)) {
-        System.out.printf("%s, Local, %s, %s, (%s,%s:%s)%n", var.getInternalId(), var.getType(), currMethod.getUniqueId(), n.getBeginLine(), n.getBeginColumn(), currMethod.getInternalId());
+        System.out.printf("%s, Local, %s, %s, (%s,%s:%s)%n", var.getInternalId(), var.getType(), currMethod.getUniqueId(), var.getBeginLine(), var.getBeginColumn(), currMethod.getInternalId());
       }
     }
 

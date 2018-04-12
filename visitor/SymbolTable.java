@@ -2,19 +2,19 @@ package visitor;
 
 import syntaxtree.*;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 
 import static visitor.SymbolTable.autoIncrementalId;
 
 // The global Symbol Table that maps class name to Class
 class SymbolTable {
 
-  public static int autoIncrementalId = 0;
+  static int autoIncrementalId = 0;
+
   private Hashtable<String, Class> hashtable;
 
   public SymbolTable() {
+    autoIncrementalId = 0;
     hashtable = new Hashtable<String, Class>();
   }
 
@@ -24,7 +24,7 @@ class SymbolTable {
     if (containsClass(id))
       return false;
     else
-      hashtable.put(id, new Class(id, parent, beginLine, beginColumn));
+      hashtable.put(id, new Class(id, parent, beginLine, beginColumn, this));
     return true;
   }
 
@@ -76,10 +76,10 @@ class SymbolTable {
     return null;
   }
 
-  // Return the declared method defined in the class named "cName" 
+  // Return the declared method defined in the class named "classId"
   // (or in one of its ancestors)
-  public Method getMethod(String id, String cName) {
-    Class c = getClass(cName);
+  public Method getMethod(ArrayList<Type> paramTypes, String id, String classId) {
+    Class c = getClass(classId);
 
     if (c == null) {
       return null;
@@ -87,8 +87,8 @@ class SymbolTable {
 
     // Try to find the declared method along the class hierarchy
     while (c != null) {
-      if (c.getMethod(id) != null) {
-        return c.getMethod(id);   // Found!
+      if (c.getMethod(paramTypes, id) != null) {
+        return c.getMethod(paramTypes, id);   // Found!
       } else if (c.getParentId() == null) {
         c = null;
       } else {
@@ -99,13 +99,19 @@ class SymbolTable {
     return null;
   }
 
-  // Get the return type of a method declared in a class named "classCope"
-  public Type getMethodType(String id, String cName) {
-    Method m = getMethod(id, cName);
-    if (m != null)
-      return m.getType();
+  public ArrayList<Class> getParentClasses(String classId) {
+    ArrayList<Class> parentClasses = new ArrayList<>();
 
-    return null;
+    Class c = getClass(classId);
+    while (c != null) {
+      if (c.getParentId() == null)
+        break;
+
+      c = getClass(c.getParentId());
+      parentClasses.add(c);
+    }
+
+    return parentClasses;
   }
 
   // Utility method to check if t1 is compatible with t2
@@ -163,16 +169,19 @@ class Class {
   protected String parent;  // Superclass's name  (null if there is no superclass)
   protected Type type;      // An instance of Type that represents this class
 
+  private final SymbolTable symbolTable;
+
   // Model a class named "id" that extend a class name "p"
   // "p" is null if class "id" does has extend any class
-  public Class(String id, String p, int beginLine, int beginColumn) {
+  public Class(String id, String p, int beginLine, int beginColumn, SymbolTable symbolTable) {
     this.id = id;
-    parent = p;
-    type = new IdentifierType(id);
-    methods = new Hashtable<String, Method>();
-    fields = new Hashtable<String, Variable>();
+    this.parent = p;
+    this.type = new IdentifierType(id);
+    this.methods = new Hashtable<String, Method>();
+    this.fields = new Hashtable<String, Variable>();
     this.beginLine = beginLine;
     this.beginColumn = beginColumn;
+    this.symbolTable = symbolTable;
   }
 
   public String getId() {
@@ -189,28 +198,62 @@ class Class {
   // will be added later
   // 
   // Return false if there is a name conflict (among all method names only)
-  public boolean addMethod(String id, Type type, int beginLine, int beginColumn) {
-    if (containsMethod(id))
+  public boolean addMethod(String id, Type type, FormalList fl, int beginLine, int beginColumn) {
+    ArrayList<Type> paramTypes = new ArrayList<>();
+    for (int i = 0; i < fl.size(); i++) {
+      paramTypes.add(fl.elementAt(i).t);
+    }
+
+    if (containsMethod(paramTypes, id))
       return false;
     else {
-      Method method = new Method(id, type, this, beginLine, beginColumn);
-      methods.put(id, method);
+      Method method = new Method(id, type, fl, this, beginLine, beginColumn);
+      methods.put(String.format("%s(%s)", method.getId(), method.getParamTypesAsString()), method);
 
       return true;
     }
   }
 
-  // Enumeration of method names
-  public Enumeration getMethods() {
-    return methods.keys();
-  }
+  // Return the method representation for the specified method
+  public Method getMethod(ArrayList<Type> paramTypes, String id) {
+    MultiValueMap<String, String> parentTypesMap = new MultiValueMap<>();
 
-  // Return the method representation for the specified method 
-  public Method getMethod(String id) {
-    if (containsMethod(id))
-      return (Method) methods.get(id);
-    else
-      return null;
+    StringBuilder builder = new StringBuilder();
+    for (int i = 0, paramsSize = paramTypes.size(); i < paramsSize; i++) {
+      // Build param types string
+      Type paramType = paramTypes.get(i);
+      builder.append(" ").append(paramTypes.get(i)).append(" ");
+      if (i != paramsSize - 1) {
+        builder.append(",");
+      }
+
+      // Store parent classes of the current param type
+      ArrayList<Class> parentClasses = symbolTable.getParentClasses(paramType.toString());
+      for (Class c : parentClasses) {
+        parentTypesMap.putValue(paramType.toString(), c.getId());
+      }
+    }
+
+    String methodKey = String.format("%s(%s)", id, builder.toString());
+    Method method = methods.get(methodKey); // Perfect match method
+
+    if (method != null) return method;
+
+    // Method with base classes
+    for (String paramType : parentTypesMap.getKeys()) {
+      Set<String> parentTypes = parentTypesMap.getValues(paramType);
+
+      for (String parentTypeId : parentTypes) {
+        methodKey = String.format("%s(%s)", id, builder.toString().replaceAll(" " + paramType + " ", " " + parentTypeId + " "));
+        method = methods.get(methodKey);
+
+        if (method == null) continue;
+
+        return method;
+      }
+    }
+
+    return null;
   }
 
   // Add a field
@@ -238,8 +281,8 @@ class Class {
     return fields.containsKey(id);
   }
 
-  public boolean containsMethod(String id) {
-    return methods.containsKey(id);
+  public boolean containsMethod(ArrayList<Type> paramTypes, String id) {
+    return this.getMethod(paramTypes, id) != null;
   }
 
   public String getParentId() {
@@ -324,7 +367,7 @@ class Method {
   protected Vector<Variable> params;          // Formal parameters
   protected Hashtable<String, Variable> vars; // Local variables
 
-  public Method(String id, Type type, Class scopingClass, int beginLine, int beginColumn) {
+  public Method(String id, Type type, FormalList fl, Class scopingClass, int beginLine, int beginColumn) {
     this.scopingClass = scopingClass;
     this.beginLine = beginLine;
     this.beginColumn = beginColumn;
@@ -332,17 +375,47 @@ class Method {
     this.type = type;
     this.params = new Vector<Variable>();
     this.vars = new Hashtable<String, Variable>();
+
+    if (fl != null)
+      for (int i = 0; i < fl.size(); i++) {
+        Formal formal = fl.elementAt(i);
+
+        if (!this.addParam(formal.i.s, formal.t, formal.token.beginLine, formal.token.beginColumn)) {
+          Variable conflictedParam = this.getParam(id);
+          System.err.printf("%s: Redeclaration (%s,%s:%s; %s,%s)%n", id, conflictedParam.getBeginLine(), conflictedParam.getBeginColumn(), conflictedParam.getScopingMethod().getInternalId(), formal.token.beginLine, formal.token.beginColumn);
+        }
+      }
   }
 
+  // y
   public String getId() {
     return id;
   }
 
+  // X::y(int x, int y)
   public String getUniqueId() {
     StringBuilder builder = new StringBuilder();
     builder.append(scopingClass.getId()).append("::").append(id).append("(");
     builder.append(getParamsAsString());
     builder.append(")");
+
+    return builder.toString();
+  }
+
+  public String getParamTypesAsString() {
+    StringBuilder builder = new StringBuilder();
+
+    for (int i = 0, paramsSize = params.size(); i < paramsSize; i++) {
+      Variable var = params.get(i);
+
+      builder.append(" ");
+      builder.append(var.getType());
+      builder.append(" ");
+
+      if (i != paramsSize - 1) {
+        builder.append(",");
+      }
+    }
 
     return builder.toString();
   }
@@ -448,3 +521,27 @@ class Method {
 } // Method
 
 
+class MultiValueMap<K, V> {
+
+  private final Map<K, Set<V>> mappings = new HashMap<K, Set<V>>();
+
+  public Set<K> getKeys() {
+    return mappings.keySet();
+  }
+
+  public Set<V> getValues(K key) {
+    return mappings.get(key);
+  }
+
+  public Boolean putValue(K key, V value) {
+    Set<V> target = mappings.get(key);
+
+    if (target == null) {
+      target = new HashSet<V>();
+      mappings.put(key, target);
+    }
+
+    return target.add(value);
+  }
+
+}

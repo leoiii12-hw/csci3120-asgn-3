@@ -2,6 +2,8 @@ package visitor;
 
 import syntaxtree.*;
 
+import java.util.ArrayList;
+
 public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
 
   private SymbolTable symbolTable;
@@ -52,7 +54,7 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
 
     symbolTable.addClass(n.i1.toString(), null, -1, -1);
     currClass = symbolTable.getClass(n.i1.toString());
-    currMethod = new Method("main", new IdentifierType("void"), currClass, -1, -1);
+    currMethod = new Method("main", new IdentifierType("void"), null, currClass, -1, -1);
     currMethod.addVar(n.i2.toString(), new IdentifierType("String[]"), -1, -1);
 
     n.s.accept(this);
@@ -159,13 +161,18 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
     Type t = n.t.accept(this);
     String id = n.i.toString();
 
-    if (!currClass.addMethod(id, t, n.getBeginLine(), n.getBeginColumn())) {
-      Method conflictedMethod = currClass.getMethod(id);
+    ArrayList<Type> paramTypes = new ArrayList<>();
+    for (int i = 0; i < n.fl.size(); i++) {
+      paramTypes.add(n.fl.elementAt(i).t);
+    }
+
+    if (!currClass.addMethod(id, t, n.fl, n.getBeginLine(), n.getBeginColumn())) {
+      Method conflictedMethod = currClass.getMethod(paramTypes, id);
       System.err.printf("%s: method Redeclaration (%s,%s; %s,%s)%n", id, conflictedMethod.getBeginLine(), conflictedMethod.getBeginColumn(), n.getBeginLine(), n.getBeginColumn());
     }
 
     // Entering a method scope 
-    currMethod = currClass.getMethod(id);
+    currMethod = currClass.getMethod(paramTypes, id);
 
     for (int i = 0; i < n.fl.size(); i++) {
       n.fl.elementAt(i).accept(this);
@@ -181,22 +188,6 @@ public class BuildSymbolTableVisitor extends TypeDepthFirstVisitor {
 
     // Leaving a method scope (return to class scope)
     currMethod = null;
-    return null;
-  }
-
-  // Type t;
-  // Identifier i;
-  // 
-  // Register a formal parameter
-  public Type visit(Formal n) {
-    Type t = n.t.accept(this);
-    String id = n.i.toString();
-
-    if (!currMethod.addParam(id, t, n.token.beginLine, n.token.beginColumn)) {
-      Variable param = currMethod.getParam(id);
-      System.err.printf("%s: Redeclaration (%s,%s:%s; %s,%s)%n", id, param.getBeginLine(), param.getBeginColumn(), param.getScopingMethod().getInternalId(), n.token.beginLine, n.token.beginColumn);
-    }
-
     return null;
   }
 

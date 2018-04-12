@@ -9,6 +9,8 @@ public abstract class Type {
 
   public abstract Type accept(TypeVisitor v);
 
+  public Class c;
+
   @Override()
   public String toString() {
     if (this instanceof IntArrayType) {

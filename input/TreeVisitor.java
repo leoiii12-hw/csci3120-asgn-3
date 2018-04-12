@@ -75,6 +75,7 @@ class TV {
 
     int_1 = this.undefinedMethod();
     int_1 = this.method1();
+    int_1 = this.Start(1); // Overloading
 
     root = new Tree();
     ntb = root.Init(16);
